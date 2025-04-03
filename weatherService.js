@@ -2,14 +2,23 @@ require('dotenv').config();
 const express = require('express');
 const axios = require('axios');
 const cors = require('cors');
+const path = require('path');
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(cors());
 
-const WEATHER_API_KEY = process.env.WEATHER_API_KEY; 
+// Serve static files from the "public" directory
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Ensure the root route ("/") serves index.html
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+const WEATHER_API_KEY = process.env.WEATHER_API_KEY;
 
 app.get('/weather', async (req, res) => {
     try {
@@ -18,7 +27,7 @@ app.get('/weather', async (req, res) => {
 
         const geoUrl = `http://api.openweathermap.org/geo/1.0/direct?q=${city}&limit=1&appid=${WEATHER_API_KEY}`;
         const geoResponse = await axios.get(geoUrl);
-        
+
         if (!geoResponse.data.length) return res.status(404).json({ error: 'City not found' });
 
         const { lat, lon } = geoResponse.data[0];
