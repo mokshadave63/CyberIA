@@ -14,7 +14,7 @@
             }
 
             try {
-                const response = await fetch(`http://localhost:3000/weather?city=${city}`);
+                const response = await fetch(`/weather?city=${city}`);
                 const data = await response.json();
                 if (data.error) {
                     document.getElementById('weatherResult').innerText = data.error;
